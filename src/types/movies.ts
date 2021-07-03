@@ -1,11 +1,8 @@
-export interface IMovie {
-  id: string
-  name: string
-  genre: string
-  director: IDirector
-}
+import { IDirector } from './directors';
 
-export interface IDirector {
-  id?: string
-  name: string
+export interface IMovie {
+  id: string;
+  name: string;
+  genre: string;
+  director: IDirector;
 }

@@ -1,4 +1,4 @@
-import { useQuery } from '@apollo/client';
+import { useMutation, useQuery } from '@apollo/client';
 import React from 'react';
 import { useForm } from 'react-hook-form';
 import {
@@ -9,19 +9,33 @@ import {
   Form,
   FormGroup,
 } from 'reactstrap';
-import { GET_ALL_DIRECTORS } from '../graphql/queries';
+import { ADD_MOVIE, GET_ALL_DIRECTORS } from '../graphql/queries';
 import { IDirector } from '../types/directors';
 
+interface IAddMovieFormData {
+  movieName: string;
+  movieGenre: string;
+  directorId: string;
+}
+
 export const SideNav: React.FC = () => {
-  const { loading, error, data } = useQuery(GET_ALL_DIRECTORS);
+  const { loading, error, data: directorList } = useQuery(GET_ALL_DIRECTORS);
+  const [addMovie, { data }] = useMutation(ADD_MOVIE);
   const {
     register,
     handleSubmit,
     // formState: { errors },
   } = useForm();
 
-  const onSubmit = (data: React.FormEvent<HTMLFormElement>) =>
-    console.log({ data });
+  const onSubmit = (formData: IAddMovieFormData) => {
+    addMovie({
+      variables: {
+        name: formData.movieName,
+        genre: formData.movieGenre,
+        directorId: formData.directorId,
+      },
+    });
+  };
 
   if (loading) return <p>Loading...</p>;
   if (error) return <p>Error :(</p>;
@@ -62,7 +76,6 @@ export const SideNav: React.FC = () => {
               <input
                 className="form-control"
                 type="text"
-                // name="movieName"
                 placeholder="タイトル"
                 {...register('movieName')}
               />
@@ -71,19 +84,14 @@ export const SideNav: React.FC = () => {
               <input
                 className="form-control"
                 type="text"
-                // name="movieGenre"
                 placeholder="ジャンル"
                 {...register('movieGenre')}
               />
             </FormGroup>
             <FormGroup className="mt-3">
-              <select
-                className="form-control"
-                // name="directroId"
-                {...register('directroId')}
-              >
-                {data &&
-                  data.getAllDirectors.map((director: IDirector) => (
+              <select className="form-control" {...register('directorId')}>
+                {directorList &&
+                  directorList.getAllDirectors.map((director: IDirector) => (
                     <option key={director.id} value={director.id}>
                       {director.name}
                     </option>

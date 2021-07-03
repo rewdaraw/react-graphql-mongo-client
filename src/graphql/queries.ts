@@ -22,3 +22,18 @@ export const GET_ALL_DIRECTORS = gql`
     }
   }
 `;
+
+export const ADD_MOVIE = gql`
+  mutation AddMovie($name: String, $genre: String, $directorId: ID!) {
+    addMovie(name: $name, genre: $genre, directorId: $directorId) {
+      id
+      name
+      genre
+      director {
+        id
+        name
+        age
+      }
+    }
+  }
+`;

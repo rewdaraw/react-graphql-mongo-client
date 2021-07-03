@@ -1,15 +1,16 @@
 import { useQuery } from '@apollo/client';
-import React from 'react';
+import React, { memo } from 'react';
 import { Card, CardBody, Table } from 'reactstrap';
 import { GET_ALL_MOVIES } from '../graphql/queries';
 import { IMovie } from '../types/movies';
 
-export const MovieList: React.FC = () => {
-  const { loading, error, data } = useQuery(GET_ALL_MOVIES);
+export const MovieList: React.FC = memo(() => {
+  console.log('MovieList rendered!');
+  const { loading, error, data: movieList } = useQuery(GET_ALL_MOVIES);
 
   if (loading) return <p>Loading...</p>;
   if (error) return <p>Error :(</p>;
-  data && console.log({ data });
+  console.log({ movieList });
 
   return (
     <Card>
@@ -23,19 +24,19 @@ export const MovieList: React.FC = () => {
             </tr>
           </thead>
           <tbody>
-            {data &&
-              data.getAllMovies.map(
-                (movie: IMovie) => (
-                  <tr key={movie.id}>
-                    <td>{movie.name}</td>
-                    <td>{movie.genre}</td>
-                    <td>{movie.director.name}</td>
-                  </tr>
-                )
-              )}
+            {movieList &&
+              movieList.getAllMovies.map((movie: IMovie) => (
+                <tr key={movie.id}>
+                  <td>{movie.name}</td>
+                  <td>{movie.genre}</td>
+                  <td>{movie.director.name}</td>
+                </tr>
+              ))}
           </tbody>
         </Table>
       </CardBody>
     </Card>
   );
-};
+});
+
+MovieList.displayName = 'MovieList';

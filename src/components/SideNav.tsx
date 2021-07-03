@@ -1,5 +1,5 @@
 import { useMutation, useQuery } from '@apollo/client';
-import React from 'react';
+import React, { memo } from 'react';
 import { useForm } from 'react-hook-form';
 import {
   Button,
@@ -9,7 +9,11 @@ import {
   Form,
   FormGroup,
 } from 'reactstrap';
-import { ADD_MOVIE, GET_ALL_DIRECTORS } from '../graphql/queries';
+import {
+  ADD_MOVIE,
+  GET_ALL_DIRECTORS,
+  GET_ALL_MOVIES,
+} from '../graphql/queries';
 import { IDirector } from '../types/directors';
 
 interface IAddMovieFormData {
@@ -18,9 +22,13 @@ interface IAddMovieFormData {
   directorId: string;
 }
 
-export const SideNav: React.FC = () => {
+export const SideNav: React.FC = memo(() => {
+  console.log('SideNav rendered!');
   const { loading, error, data: directorList } = useQuery(GET_ALL_DIRECTORS);
-  const [addMovie, { data }] = useMutation(ADD_MOVIE);
+  const [addMovie] = useMutation(ADD_MOVIE, {
+    refetchQueries: [{ query: GET_ALL_MOVIES }],
+    awaitRefetchQueries: true,
+  });
   const {
     register,
     handleSubmit,
@@ -39,6 +47,7 @@ export const SideNav: React.FC = () => {
 
   if (loading) return <p>Loading...</p>;
   if (error) return <p>Error :(</p>;
+  console.log({ directorList });
 
   return (
     <>
@@ -106,4 +115,6 @@ export const SideNav: React.FC = () => {
       </Card>
     </>
   );
-};
+});
+
+SideNav.displayName = 'SideNav';

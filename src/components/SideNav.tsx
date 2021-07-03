@@ -1,5 +1,6 @@
 import { useQuery } from '@apollo/client';
 import React from 'react';
+import { useForm } from 'react-hook-form';
 import {
   Button,
   Card,
@@ -13,7 +14,14 @@ import { IDirector } from '../types/directors';
 
 export const SideNav: React.FC = () => {
   const { loading, error, data } = useQuery(GET_ALL_DIRECTORS);
-  console.log({ data });
+  const {
+    register,
+    handleSubmit,
+    // formState: { errors },
+  } = useForm();
+
+  const onSubmit = (data: React.FormEvent<HTMLFormElement>) =>
+    console.log({ data });
 
   if (loading) return <p>Loading...</p>;
   if (error) return <p>Error :(</p>;
@@ -49,28 +57,36 @@ export const SideNav: React.FC = () => {
       <Card className="mt-5">
         <CardHeader>映画作品</CardHeader>
         <CardBody>
-          <Form>
+          <Form onSubmit={handleSubmit(onSubmit)}>
             <FormGroup>
               <input
                 className="form-control"
                 type="text"
-                name="movieName"
+                // name="movieName"
                 placeholder="タイトル"
+                {...register('movieName')}
               />
             </FormGroup>
             <FormGroup className="mt-3">
               <input
                 className="form-control"
-                type="number"
-                name="movieGenre"
+                type="text"
+                // name="movieGenre"
                 placeholder="ジャンル"
+                {...register('movieGenre')}
               />
             </FormGroup>
             <FormGroup className="mt-3">
-              <select className="form-control" name="directroId">
+              <select
+                className="form-control"
+                // name="directroId"
+                {...register('directroId')}
+              >
                 {data &&
                   data.getAllDirectors.map((director: IDirector) => (
-                    <option key={director.id}>{director.name}</option>
+                    <option key={director.id} value={director.id}>
+                      {director.name}
+                    </option>
                   ))}
               </select>
             </FormGroup>

@@ -11,6 +11,7 @@ import {
 } from 'reactstrap';
 import {
   ADD_MOVIE,
+  ADD_DIRECTOR,
   GET_ALL_DIRECTORS,
   GET_ALL_MOVIES,
 } from '../graphql/queries';
@@ -22,6 +23,11 @@ interface IAddMovieFormData {
   directorId: string;
 }
 
+interface IAddDirectorFormData {
+  directorName: string;
+  directorAge: number;
+}
+
 export const SideNav: React.FC = memo(() => {
   console.log('SideNav rendered!');
   const { loading, error, data: directorList } = useQuery(GET_ALL_DIRECTORS);
@@ -29,13 +35,16 @@ export const SideNav: React.FC = memo(() => {
     refetchQueries: [{ query: GET_ALL_MOVIES }],
     awaitRefetchQueries: true,
   });
-  const {
-    register,
-    handleSubmit,
-    // formState: { errors },
-  } = useForm();
+  const [addDirector] = useMutation(ADD_DIRECTOR, {
+    refetchQueries: [{ query: GET_ALL_DIRECTORS }],
+    awaitRefetchQueries: true,
+  });
+  const { register, handleSubmit } = useForm();
 
-  const onSubmit = (formData: IAddMovieFormData) => {
+  const { register: registerDirector, handleSubmit: handleSubmitDirector } =
+    useForm();
+
+  const onSubmit = (formData: IAddMovieFormData, e: any) => {
     addMovie({
       variables: {
         name: formData.movieName,
@@ -43,6 +52,18 @@ export const SideNav: React.FC = memo(() => {
         directorId: formData.directorId,
       },
     });
+    e.target.reset();
+  };
+
+  const onSubmitDirector = (directorFormData: IAddDirectorFormData, e: any) => {
+    console.log(directorFormData);
+    addDirector({
+      variables: {
+        name: directorFormData.directorName,
+        age: Number(directorFormData.directorAge),
+      },
+    });
+    e.target.reset();
   };
 
   if (loading) return <p>Loading...</p>;
@@ -54,21 +75,21 @@ export const SideNav: React.FC = memo(() => {
       <Card>
         <CardHeader>映画監督</CardHeader>
         <CardBody>
-          <Form>
+          <Form onSubmit={handleSubmitDirector(onSubmitDirector)}>
             <FormGroup>
               <input
                 className="form-control"
                 type="text"
-                name="directorName"
                 placeholder="監督"
+                {...registerDirector('directorName')}
               />
             </FormGroup>
             <FormGroup className="mt-3">
               <input
                 className="form-control"
                 type="number"
-                name="directorAge"
                 placeholder="年齢"
+                {...registerDirector('directorAge')}
               />
             </FormGroup>
             <Button className="mt-3" color="primary" type="submit">

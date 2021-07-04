@@ -37,3 +37,13 @@ export const ADD_MOVIE = gql`
     }
   }
 `;
+
+export const ADD_DIRECTOR = gql`
+  mutation addDirector($name: String, $age: Int) {
+    addDirector(name: $name, age: $age) {
+      id
+      name
+      age
+    }
+  }
+`;
